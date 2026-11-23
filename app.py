@@ -1,40 +1,41 @@
-import streamlit as st
+ import streamlit as st
 import pandas as pd
 import random
-import time
+import plotly.express as px
 
 st.set_page_config(page_title="Smart IoT Lab Monitoring", layout="wide")
-st.title("🧪 Smart IoT Lab Monitoring System")
-st.markdown("Live Monitoring of Lab - Temperature, Humidity, Gas & Light")
+st.title("🧪 Smart IoT Lab Monitoring System - V2")
+st.markdown("Day 2 Upgrade - Live Graph + Buzzer + History")
 
-# Sidebar Control
 st.sidebar.header("⚙️ Control Panel")
 lab = st.sidebar.selectbox("Select Lab", ["ECE Lab 1", "ECE Lab 2", "Embedded Lab"])
-refresh = st.sidebar.slider("Refresh Speed (sec)", 1, 10, 2)
 gas_limit = st.sidebar.slider("Gas Alert Limit", 200, 800, 400)
+buzzer = st.sidebar.toggle("🔊 Buzzer Sound", value=True)
 
-# Fake Live Sensor Data
 temp = round(random.uniform(24, 35), 1)
 hum = round(random.uniform(45, 80), 1)
 gas = random.randint(150, 600)
 light = random.randint(100, 900)
 
-# Alert Logic
 if gas > gas_limit:
-    st.error(f"🚨 GAS LEAKAGE ALERT! Gas Level: {gas} ppm - Evacuate Lab Immediately!")
+    st.error(f"🚨 GAS LEAKAGE! Gas: {gas} ppm - Evacuate!")
+    if buzzer:
+        st.warning("🔊 BUZZER: BEEP... BEEP... BEEP... - Buzzer ON!")
+        st.audio("https://www.soundjay.com/buttons/beep-01a.wav")
+    else:
+        st.info("🔇 Buzzer OFF la irukku - ON pannu!")
 elif temp > 32:
-    st.warning(f"⚠️ HIGH TEMPERATURE! Temp: {temp} °C - Check AC!")
+    st.warning(f"⚠️ HIGH TEMP! {temp} °C - Check AC!")
 else:
-    st.success(f"✅ Lab is SAFE - All Systems Normal - {lab}")
+    st.success(f"✅ {lab} is SAFE - All Normal")
 
-# 4 Big Boxes
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("🌡️ Temperature", f"{temp} °C", "Normal" if temp < 32 else "HIGH")
-col2.metric("💧 Humidity", f"{hum} %", "Good")
-col3.metric("🔥 Gas Level", f"{gas} ppm", "DANGER" if gas > gas_limit else "Safe")
-col4.metric("💡 Light Intensity", f"{light} lux", "Bright" if light > 400 else "Dim")
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("🌡️ Temperature", f"{temp} °C")
+c2.metric("💧 Humidity", f"{hum} %")
+c3.metric("🔥 Gas", f"{gas} ppm")
+c4.metric("💡 Light", f"{light} lux")
 
-# Graph Data
+st.subheader("📊 Live Sensor Trends - Day 2")
 data = {
     "Time": ["10:00", "10:05", "10:10", "10:15", "10:20", "Now"],
     "Temperature": [26.5, 27.1, 28.0, 27.5, temp-1, temp],
@@ -42,9 +43,9 @@ data = {
     "Gas": [200, 220, 250, 300, gas-50, gas]
 }
 df = pd.DataFrame(data)
-st.subheader("📊 Live Sensor Trends")
-st.line_chart(df.set_index("Time"))
+fig = px.line(df, x="Time", y=["Temperature", "Humidity", "Gas"], markers=True, title="Lab Sensor Live Graph")
+st.plotly_chart(fig, use_container_width=True)
 
-st.subheader("📋 Latest Sensor Data")
+st.subheader("📜 History - Last 6 Readings")
 st.dataframe(df, use_container_width=True)
-st.caption("Made by Tholkappiyan | Smart IoT Lab Monitoring System")
+st.caption("Made by Tholkappiyan | V2 - Buzzer + History Added")
