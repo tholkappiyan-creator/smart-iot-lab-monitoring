@@ -20,6 +20,11 @@ Smart IoT Lab Monitoring System using Python Streamlit.
 
 ### How to Run:
 pip install -r requirements.txt
-streamlit run app.py
+
+### Hardware - ESP32 (Wokwi)
+
+This project uses ESP32 + DHT22 + MQ2 sensor to detect Gas Leak and Fire.
+If Gas value > 1500 or Temperature > 45, Buzzer and LED will turn ON.
+Hardware code and circuit are available in the `esp32-firmware` folder.
 
 Made by Tholkappiyan
